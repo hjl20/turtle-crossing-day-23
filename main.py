@@ -16,29 +16,39 @@ screen.listen()
 screen.onkey(player.move, "Up")
 screen.onkey(player.move, "w")
 
-game_timer = 0
-game_is_on = True
-while game_is_on:
-    time.sleep(0.1)
-    screen.update()
 
-    if game_timer % 6 == 0:
-        car_manager.create_car()
-    if car_manager.cars:
-        car_manager.move_cars()
+def next_level():
+    player.reset_position()
+    car_manager.increase_speed()
+    scoreboard.update_score()
 
-    # Detect collision with finish line
-    if player.in_goal():
-        player.reset_position()
-        car_manager.increase_speed()
-        scoreboard.update_score()
 
-    # Detect collision with car
-    for car in car_manager.cars:
-        if player.distance(car) < 20:
-            scoreboard.game_over()
-            game_is_on = False
+def turtle_crossing():
+    game_timer = 0
+    game_is_on = True
+    while game_is_on:
+        time.sleep(0.1)
+        screen.update()
 
-    game_timer += 1
+        # Spawn car every 6th game loop
+        if game_timer % 6 == 0:
+            car_manager.create_car()
+        if car_manager.cars:
+            car_manager.move_cars()
 
-screen.exitonclick()
+        # Detect collision with finish line
+        if player.in_goal():
+            next_level()
+
+        # Detect collision with car
+        for car in car_manager.cars:
+            if player.distance(car) < 20:
+                scoreboard.game_over()
+                game_is_on = False
+
+        game_timer += 1
+
+    screen.exitonclick()
+
+
+turtle_crossing()
